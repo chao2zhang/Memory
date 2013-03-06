@@ -1,0 +1,57 @@
+继android中自定义ListView 知道怎样自定义ListView后，也许在开发过程中会遇到这样的需求：
+一个Activity，其中不只有ListView一个控件，还有其他的TextView、ImageView、Button等等很多控件，这样很可能会占据屏幕很大一部分，要知道手机的屏幕只有480像素，通常的想法是给这个Activity加上一个ScrollView，让其有滚动条，但是会发现ListView的高度不是随着内容而自动填充的。那么我们可以使用ListView的addHeaderView以及addFooterView 为ListView增加上下的头和尾，这样就可以让ListView填充到整个屏幕。
+新建一个Layout:
+demo_list_item_header_view.xml:
+<!--?xml version="1.0" encoding="utf-8"?-->
+<linearlayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="wrap_content" android:layout_height="wrap_content">
+<textview android:text="TestListViewHeader" android:id="@+id/headerTextView" android:textsize="20sp" android:layout_width="wrap_content" android:layout_height="30sp">
+</textview></linearlayout>
+然后新建一个类，继承自LinearLayout用来显示上面的Layout:
+DemoListHeaderView.java
+package com.zhang.test.view;
+ 
+import com.zhang.test.R;
+ 
+import android.content.Context;
+import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+ 
+public class DemoListHeaderView extends LinearLayout {
+ 
+private static final String TAG = "DemoListHeaderView";
+private Context context;
+private TextView textView;
+ 
+public DemoListHeaderView(Context context, AttributeSet attrs) {
+super(context, attrs);
+initialize(context);
+}
+ 
+public DemoListHeaderView(Context context) {
+super(context);
+initialize(context);
+}
+ 
+private void initialize(Context context) {
+this.context = context;
+View view = LayoutInflater.from(this.context).inflate(R.layout.demo_list_item_header_view, null);
+textView = (TextView) view.findViewById(R.id.headerTextView);
+addView(view);
+}
+ 
+public void setTextView(String text) {
+textView.setText(text);
+}
+}
+之后在ListView设置setAdapter之前，一定要在setAdapter之前
+加上代码:
+        DemoListHeaderView headerView = new DemoListHeaderView(context);
+        headerView.setTextView("Header : ");
+        listView.addHeaderView(headerView);
+ 
+        DemoListHeaderView footerView = new DemoListHeaderView(context);
+        footerView.setTextView("Footer : ");
+        listView.addFooterView(footerView);
