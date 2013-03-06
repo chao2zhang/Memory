@@ -1,0 +1,22 @@
+import qm
+zeros = []
+ones = []
+dc = []
+z = raw_input('file:')
+with open(z) as f:
+nums = reduce(lambda x, y: x.strip() + y.strip(), f.readlines())
+print nums
+print len(nums)
+for i in range(0, len(nums)):
+ch = nums[i]
+if ch == '1':
+ones.append(i)
+elif ch == '0':
+zeros.append(i)
+elif ch == 'X':
+dc.append(i)
+print '1:'
+print ones
+print 'dc:'
+print dc
+print qm.qm(ones=ones, dc=dc)
