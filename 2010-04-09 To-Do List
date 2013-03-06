@@ -1,0 +1,15 @@
+Val++
+友爱的计算器
+1.实现+-*/sincos**()等运算 (Finished)
+2.实现角度与弧度的运算 (Finished)
+3.e的处理 (Finished)
+4.任意变量 (Finished)
+5.友好的错误提示 ^(Finished)
+Total 692 lines
+Init.h 163 lines
+Read.h 174 lines
+Work.h 290 lines
+main.cpp 32 lines
+Prior.txt 30 lines
+Num.txt Op.txt Var.txt 1 line for each
+Good job!
