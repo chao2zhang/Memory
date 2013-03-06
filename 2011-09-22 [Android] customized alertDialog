@@ -1,0 +1,22 @@
+
+时间：2011年05月22日作者：ronald查看次数:674 views评论次数：0
+有时候我们需要在游戏或应用中用一些符合我们样式的提示框(AlertDialog)
+以下是我在开发一个小游戏中总结出来的.希望对大家有用.
+先上效果图:
+
+下面是用到的背景图或按钮的图片
+
+
+经过查找资料和参考了一下例子后才知道,要实现这种效果很简单.就是在设置alertDialog的contentView.
+以下的代码是写在Activity下的,代码如下:
+public boolean onKeyDown(int keyCode, KeyEvent event){// 如果是返回键,直接返回到桌面
+if(keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_HOME){ showExitGameAlert();}   returnsuper.onKeyDown(keyCode, event);}
+private void showExitGameAlert(){
+finalAlertDialog dlg = new AlertDialog.Builder(this).create(); 
+ dlg.show();Window window = dlg.getWindow();// *** 主要就是在这里实现这种效果的.
+// 设置窗口的内容页面,shrew_exit_dialog.xml文件中定义view内容	window.setContentView(R.layout.shrew_exit_dialog);
+// 为确认按钮添加事件,执行退出应用操作	ImageButton ok = (ImageButton) window.findViewById(R.id.btn_ok);	ok.setOnClickListener(newView.OnClickListener(){publicvoid onClick(View v){	 exitApp();// 退出应用...}});  
+  // 关闭alert对话框架 ImageButton cancel = (ImageButton) window.findViewById(R.id.btn_cancel); cancel.setOnClickListener(newView.OnClickListener(){publicvoid onClick(View v){	 dlg.cancel();}});}
+以下的是layout文件,定义了对话框中的背景与按钮.点击事件在Activity中添加.
+文件名为 : shrew_exit_dialog.xml
+<?xmlversion="1.0"encoding="utf-8"?><RelativeLayoutxmlns:android="http://schemas.android.com/apk/res/android"android:layout_height="wrap_content"android:layout_width="wrap_content"> 	<!-- 退出游戏的背景图 --><ImageViewandroid:id="@+id/exitGameBackground"android:layout_centerInParent="true"android:layout_height="wrap_content"android:layout_width="wrap_content"android:src="@drawable/bg_exit_game"/> 	<!-- 确认按钮 --><ImageButtonandroid:layout_alignBottom="@+id/exitGameBackground"android:layout_alignLeft="@+id/exitGameBackground"android:layout_marginBottom="30dp"android:layout_marginLeft="35dp"android:id="@+id/btn_ok"android:layout_height="wrap_content"android:layout_width="wrap_content"android:background="@drawable/btn_ok"/> 	<!-- 取消按钮 --><ImageButtonandroid:layout_alignBottom="@+id/exitGameBackground"android:layout_alignRight="@+id/exitGameBackground"android:layout_marginBottom="30dp"android:layout_marginRight="35dp"android:id="@+id/btn_cancel"android:layout_height="wrap_content"android:layout_width="wrap_content"android:background="@drawable/btn_cancel"/></RelativeLayout>
