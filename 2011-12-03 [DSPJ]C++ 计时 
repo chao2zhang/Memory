@@ -1,0 +1,21 @@
+为了方便大家完成DS的PJ，计时的代码可以如下写：
+
+ 
+
+#include<stdio.h>
+
+#include<stlib.h>
+
+#include<time.h>
+
+void main() {
+   clock_t start,finish;
+   float totatTime;
+   start=clock();
+
+   ……                     //YOUR PROGRAM
+
+   finish=clock();
+   totaltime=(float)(finish-start)/CLOCKS_PER_SEC;
+   printf("%.3f seconds", totalTime);
+}
