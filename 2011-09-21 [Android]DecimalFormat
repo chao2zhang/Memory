@@ -1,0 +1,165 @@
+[Android]DecimalFormat
+http://blog.csdn.net/thunder4393/article/details/1739911
+1       修改历史
+版本
+修改历史
+ 作者
+描述
+开发时间(h)
+0.1
+2007-8-12
+LevinSoft
+创建文档得基本结构、基本流程
+1
+2       介绍
+ 
+本文对DecimalFormat类进行介绍和分析，主要包括：模式、特殊模式字符、科学计数法、舍入、阿拉伯数字、特殊值等。
+并且结合实际例子，说明它的使用上的一些方法和技巧。
+3       基本概念
+DecimalFormat 是 NumberFormat 的一个具体子类，用于格式化十进制数字。该类设计有各种功能，使其能够分析和格式化任意语言环境中的数，包括对西方语言、阿拉伯语和印度语数字的支持。它还支持不同类型的数，包括整数 (123)、定点数 (123.4)、科学记数法表示的数 (1.23E4)、百分数 (12%) 和金额 ($123)。所有这些内容都可以本地化。
+要获取具体语言环境的 NumberFormat（包括默认语言环境），可调用 NumberFormat 的某个工厂方法，如 getInstance()。通常不直接调用 DecimalFormat 的构造方法，因为 NumberFormat 的工厂方法可能返回不同于 DecimalFormat 的子类。如果需要自定义格式对象，可执行：
+ NumberFormat f = NumberFormat.getInstance(loc);
+if (f instanceof DecimalFormat) {
+     ((DecimalFormat) f).setDecimalSeparatorAlwaysShown(true);
+}
+DecimalFormat 包含一个模式 和一组符号。可直接使用 applyPattern() 或间接使用 API 方法来设置模式。符号存储在 DecimalFormatSymbols 对象中。使用 NumberFormat 工厂方法时，可从已本地化的 ResourceBundle 中读取模式和符号。
+3.1    模式
+3.1.1            介绍
+DecimalFormat 模式包含正数和负数子模式，例如 "#,##0.00;(#,##0.00)"。每个子模式都有前缀、数字部分和后缀。负数子模式是可选的；如果存在，则将用已本地化的减号（在多数语言环境中是 '-'）作为前缀的正数子模式用作负数子模式。也就是说，单独的 "0.00" 等效于 "0.00;-0.00"。如果存在显式的负数子模式，则它仅指定负数前缀和后缀；数字位数、最小位数，其他特征都与正数模式相同。这意味着 "#,##0.0#;(#)" 的行为与 "#,##0.0#;(#,##0.0#)" 完全相同。
+分组分隔符通常用于千位，但是在某些国家中它用于分隔万位。分组大小是分组字符之间的固定数字位数，例如 100,000,000 是 3，而 1,0000,0000 则是 4。如果使用具有多个分组字符的模式，则最后一个分隔符和整数结尾之间的间隔才是使用的分组大小。所以 "#,##,###,####" == "######,####" == "##,####,####"。
+3.1.2            实例
+1．String val = new DecimalFormat("0.00").format(12);
+value is:12.00
+2．String val = new DecimalFormat("990.05").format(12);
+value is:9912.05
+特点：
+1．可以设置默认输出的值。
+2．0是特殊模式字符，没有数字填充时，默认填写0。
+使用场景：
+1．在报表中，设置默认小数点后输出几位0的方式，。
+3.2    特殊模式字符
+3.2.1            介绍
+模式中的很多字符都是按字面解释的；在分析期间对其进行匹配，在格式化期间则不经改变地输出。另一方面，特殊字符代表了其他字符、字符串或字符类。如果要将其作为字面量出现在前缀或后缀中，那么除非另行说明，否则必须对其加引号。
+下列字符用在非本地化的模式中。已本地化的模式使用从此 formatter 的 DecimalFormatSymbols 对象中获得的相应字符，这些字符已失去其特殊状态。两种例外是货币符号和引号，不将其本地化。
+符号
+位置
+本地化？
+含义
+0
+数字
+是
+阿拉伯数字
+#
+数字字
+是
+阿拉伯数字，如果不存在则显示为空
+.
+数字
+是
+小数分隔符或货币小数分隔符
+-
+数字
+是
+减号
+,
+数字
+是
+分组分隔符
+E
+数字
+是
+分隔科学计数法中的尾数和指数。在前缀或后缀中无需加引号。
+;
+子模式边界
+是
+分隔正数和负数子模式
+%
+前缀或后缀
+是
+乘以 100 并显示为百分数
+/u2030
+前缀或后缀
+是
+乘以 1000 并显示为千分数
+¤ (/u00A4)
+前缀或后缀
+否
+货币记号，由货币符号替换。如果两个同时出现，则用国际货币符号替换。如果出现在某个模式中，则使用货币小数分隔符，而不使用小数分隔符。
+'
+前缀或后缀
+否
+用于在前缀或或后缀中为特殊字符加引号，例如 "'#'#" 将 123 格式化为 "#123"。要创建单引号本身，请连续使用两个单引号："# o''clock"。
+3.2.2            实例
+1．String val = new DecimalFormat("0.##").format(12.5);
+System.out.println("value is:" + val);
+value is:12.5
+2． String val = new DecimalFormat("0.###").format(12.57);
+    System.out.println("value is:" + val);
+value is:12.57
+特点：
+1． ＃ 代表一位阿拉伯数字，如果不存在则显示为空
+场景：
+1．在要求的显示长度确定下，比如：只允许整数或输出小数点后一位或两位，就可以设置0.##。
+3.3    科学计数法
+科学计数法中的数表示为一个尾数和一个 10 的几次幂的乘积，例如可将 1234 表示为 1.234 x 10^3。尾数的范围通常是 1.0 <= x < 10.0，但并非必需如此。可指示 DecimalFormat 仅通过某个模式 来格式化和分析科学计数法表示的数；目前没有创建科学计数法格式的工厂方法。在这个模式中，指数字符后面紧跟着一个或多个数字字符即指示科学计数法。示例："0.###E0" 将数字 1234 格式化为 "1.234E3"。
+指数字符后面的数字位数字符数给出了最小的指数位数。没有最大值。使用本地化的减号来格式化负数指数，不 使用模式中的前缀和后缀。这就允许存在诸如 "0.###E0 m/s" 等此类的模式。
+最小和最大整数数字位数一起进行解释：
+如果最大整数数字位数大于其最小整数数字位数并且大于 1，则强制要求指数为最大整数数字位数的倍数，并将最小整数数字位数解释为 1。最常见的用法是生成工程计数法，其中指数是 3 的倍数，如 "##0.#####E0"。使用此模式时，数 12345 格式化为 "12.345E3"，123456 则格式化为 "123.456E3"。
+否则通过调整指数来得到最小整数数字位数。示例：使用 "00.###E0" 格式化 0.00123 时得到 "12.3E-4"。
+尾数中的有效位数是最小整数 和最大小数 位数的和，不受最大整数位数的影响。例如，使用 "##0.##E0" 格式化 12345 得到 "12.3E3"。要显示所有位数，请将有效位数计数设置为零。有效位数不会影响分析。
+指数模式可能不包含分组分隔符。
+3.4    舍入
+DecimalFormat 使用 half-even 舍入（请参阅 ROUND_HALF_EVEN）进行格式化。
+实例：
+String val = new DecimalFormat("#0.0").format(12.08);
+System.out.println("value is:" + val);
+value is:12.1
+3.5    阿拉伯数字
+为了进行格式化，DecimalFormat 使用 DecimalFormatSymbols 对象中所定义的、从已本地化的阿拉伯数字 0 开始的 10 个连续字符作为阿拉伯数字。为了进行分析，可识别 Character.digit所定义的这些阿拉伯数字和所有 Unicode 十进制阿拉伯数字。
+3.6    特殊值
+NaN 被格式化为单个字符，通常是 /uFFFD。此字符由 DecimalFormatSymbols 对象所确定。这是惟一不使用前缀和后缀的值。
+无穷大的值被格式化为单个字符，通常是 /u221E，具有正数或负数前缀和后缀。无穷大值的字符由 DecimalFormatSymbols 对象所确定。
+将负零（"-0"）分析为
+如果 isParseBigDecimal() 为 true，则为 BigDecimal(0)，
+如果 isParseBigDecimal() 为 false 并且 isParseIntegerOnly() 为 true，则为 Long(0)，
+如果 isParseBigDecimal() 和 isParseIntegerOnly() 均为 false，则为 Double(-0.0)。
+3.7    同步
+DecimalFormat 通常不是同步的。建议为每个线程创建独立的格式实例。如果多个线程同时访问某个格式，则必须保持外部同步。
+3.7.1            示例
+ // Print out a number using the localized number, integer, currency,
+// and percent format for each locale
+Locale[] locales = NumberFormat.getAvailableLocales();
+double myNumber = -1234.56;
+NumberFormat form;
+for (int j=0; j<4; ++j) {
+     System.out.println("FORMAT");
+     for (int i = 0; i < locales.length; ++i) {
+         if (locales[i].getCountry().length() == 0) {
+            continue; // Skip language-only locales
+         }
+         System.out.print(locales[i].getDisplayName());
+         switch (j) {
+         case 0:
+             form = NumberFormat.getInstance(locales[i]); break;
+         case 1:
+             form = NumberFormat.getIntegerInstance(locales[i]); break;
+         case 2:
+             form = NumberFormat.getCurrencyInstance(locales[i]); break;
+default:
+             form = NumberFormat.getPercentInstance(locales[i]); break;
+         }
+         if (form instanceof DecimalFormat) {
+             System.out.print(": " + ((DecimalFormat) form).toPattern());
+         }
+         System.out.print(" -> " + form.format(myNumber));
+         try {
+             System.out.println(" -> " + form.parse(form.format(myNumber)));
+} catch (ParseException e) {}
+     }
+}
+4       总结和展望
+a)      简单的总结前面知识
+b)      今后的提高部分
+5       参考资料
+6       术语和附录
+ 
